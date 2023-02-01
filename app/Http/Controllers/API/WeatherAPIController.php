@@ -3,25 +3,26 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\APIController;
+use App\Http\Controllers\SourceAPI\FrequencyModelUpdateController;
 use App\Http\Controllers\SourceAPI\OpenWeatherSourceAPIController as OpenWeatherAPI;
-use App\Interfaces\RepositoryInterface;
+use App\Http\Controllers\TimestampsFreshnessController;
 use App\Interfaces\WeatherRepositoryInterface;
-use App\Jobs\QueryOpenWeatherSourceAPI as QueryAPI;
+use App\Jobs\QueryOpenWeatherJob as QueryJob;
 
 class WeatherAPIController extends APIController
 {
 
  public $repository;
- public $weatherRepository;
  protected $api;
 
 //
 
- public function __construct(WeatherRepositoryInterface $weatherRepository, RepositoryInterface $repository, OpenWeatherAPI $api)
+ public function __construct(WeatherRepositoryInterface $repository, OpenWeatherAPI $api)
  {
-  $this->weatherRepository = $weatherRepository;
-  $this->repository        = $repository;
+  $this->repository = $repository;
   $this->api               = $api;
+  FrequencyModelUpdateController::$frequency = 1;
+  TimestampsFreshnessController::$acceptedInterval = 60;
  }
 
  /**
@@ -60,7 +61,7 @@ class WeatherAPIController extends APIController
  private function prepareData($country, $city, $modelCheck, $job = true)
  {
   if ($job) {
-   QueryAPI::dispatchSync($country, $city, $modelCheck);
+   QueryJob::dispatchSync($country, $city, $modelCheck);
    $query = $this->queryDB($city);
 
   } else {
@@ -68,7 +69,7 @@ class WeatherAPIController extends APIController
   }
 
   if ($query == null) {
-   return QueryAPI::$errors;
+   return QueryJob::$errors;
 
   } else {
    return $query;
@@ -78,7 +79,7 @@ class WeatherAPIController extends APIController
 
  private function queryDB($city)
  {
-  return $this->weatherRepository->findWeatherByCityName($city);
+  return $this->repository->findWeatherByCityName($city);
  }
 
  public function getLastTimestamp()

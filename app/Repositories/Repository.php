@@ -2,18 +2,20 @@
 
 namespace App\Repositories;
 
+use App\Http\Controllers\TimestampsFreshnessController;
 use App\Interfaces\RepositoryInterface;
-use App\Traits\CompareTime;
 
 class Repository implements RepositoryInterface
 {
- use CompareTime;
 
- public $model;
+ protected $compareTimeController;
+
+ protected $model;
 
  public function __construct($model)
  {
-  $this->model = $model;
+  $this->compareTimeController = new TimestampsFreshnessController();
+  $this->model                 = $model;
  }
 
  public function getAll()
@@ -80,9 +82,8 @@ class Repository implements RepositoryInterface
 
  public function checkIfModelFreshByValue($column, $value)
  {
-  $cityDBTimestamp = $this->getTimestampByValue($column, $value);
-
-  return $this->compareTime($cityDBTimestamp);
+  $cityDBTimestamp = $this->model->where($column, $value)->value('updated_at');
+  return $this->compareTimeController->isFitInAcceptedInterval($cityDBTimestamp);
  }
 
 /**

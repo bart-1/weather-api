@@ -2,15 +2,17 @@
 
 namespace App\Jobs;
 
+use App\Http\Controllers\SourceAPI\FrequencyModelUpdateController;
 use App\Http\Controllers\SourceAPI\OpenWeatherSourceAPIController;
-use App\Repositories\WeatherRepository;
+use App\Interfaces\WeatherRepositoryInterface;
+use App\Models\Weather;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class QueryOpenWeatherSourceAPI implements ShouldQueue
+class QueryOpenWeatherJob implements ShouldQueue
 {
  use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -37,8 +39,11 @@ class QueryOpenWeatherSourceAPI implements ShouldQueue
   *
   * @return void
   */
- public function handle(OpenWeatherSourceAPIController $api, WeatherRepository $repository)
+ public function handle(OpenWeatherSourceAPIController $api, WeatherRepositoryInterface $repository, Weather $weather)
  {
+
+  $this->frequencyKeeper($weather);
+
   $url     = $api->createOpenWeatherApiUrl($this->country, $this->city);
   $weather = $api->apiHarvest($url);
 
@@ -69,5 +74,10 @@ class QueryOpenWeatherSourceAPI implements ShouldQueue
   }
  }
 
-}
+ private function frequencyKeeper($weather)
+ {
+  $frequencyKeeper = new FrequencyModelUpdateController($weather);
+  $frequencyKeeper->realizeWithFrequency();
+ }
 
+}

@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface WeatherRepositoryInterface
+interface WeatherRepositoryInterface extends RepositoryInterface
 {
  public function findWeatherByCityName($city);
 

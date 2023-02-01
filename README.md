@@ -12,43 +12,26 @@ This is a RestAPI Service (in this case it is weather data for a city) for placi
 
 ## Instruction
 
-You must add your api key in .env file as
+1. You must add your Open Weather api key in .env file as
 
 ```
 API_KEY=
 ```
-
-GET: [yourdomain]/api/weather/[country_code]/[city]
-
-in trait Comparable:
-
-```php
-namespace App\Http\Traits;
-
-trait Comparable
-{
- /**
-  * compare sended value of timestamp to now timestamp and check is fit in interval
-  * @param string $time time you need to check
-  * @param int $interval optional parameter, default is 60 seconds
-  * @return bool
-  */
- public function compareTime($time, $interval = 60)
- {
-
-  if (strtotime('now') - strtotime($time) < $interval) {
-   return true;
-  } else {
-   return false;
-  }
- }
-}
+2. Set how often is possible to query outer source API:
+``` php
+FrequencyModelUpdateController::$frequency 
 
 ```
 
-$interval parameter (seconds) decides about freshness data in database. Default is 60 seconds.
+3. Set how long model data is accepted as fresh.
+``` php
+TimestampsFreshnessController::$acceptedInterval
+```
 
-### In this moment, frequency of queries to outer API is a result of settings of API routes in RateLimiter class in App/Providers/RouteServiceProvider.
+4. Query by GET: 
+```
+[yourdomain]/api/weather/[country_code]/[city]
+```
 
 ## License
 
