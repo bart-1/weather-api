@@ -15,9 +15,9 @@ class StressApiQueueTest extends TestCase
  {
   for ($i = 1; $i <= 60; $i++) {
 
-   $this->get('/api/weather/pl/warszawa');
+   $this->get('/weather-api/pl/warszawa');
   }
-  $response = $this->get('/api/weather/pl/warszawa');
+  $response = $this->get('/weather-api/pl/warszawa');
 
   $response->assertStatus(429);
  }

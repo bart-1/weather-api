@@ -14,11 +14,11 @@ class TestWarszawaPlSeeder extends Seeder
   */
  public function run()
  {
-  Weather::create([
-   'weather' => 'test_value1',
-   'country' => 'pl',
-   'city'    => 'warsaw',
-  ]);
+//   Weather::create([
+//    'weather' => 'test_value1',
+//    'country' => 'pl',
+//    'city'    => 'warsaw',
+//   ]);
   Weather::create([
    'weather' => 'test_value2',
    'country' => 'pl',

@@ -21,15 +21,34 @@ class CheckModelStatusTest extends TestCase
   * @return void
   */
 
- public function test_for_unknown_model_from_query_returned_is_string_with_content_null()
+ public function test_for_unknown_model_is_returned_string_with_content_null()
  {
 
-  $column     = 'city';
-  $value      = 'wrongName';
+ $columnOne = 'country';
+$valueOne  = 'pl';
+$columnTwo = 'city';
+$valueTwo  = 'warszawa';
+
   $weather    = new Weather();
   $repository = new WeatherRepository($weather);
 
-  $query = $repository->checkModelStatus($column, $value);
+  $query = $repository->checkModelStatus($columnOne, $valueOne, $columnTwo, $valueTwo);
+  echo $query . ' ';
+  $this->assertTrue($query === 'null');
+ }
+ public function test_for_city_with_wrong_country_is_retuned_string_with_content_null()
+ {
+$this->seed(TestWarszawaPlSeeder::class);
+
+ $columnOne = 'country';
+$valueOne  = 'en';
+$columnTwo = 'city';
+$valueTwo  = 'warszawa';
+
+  $weather    = new Weather();
+  $repository = new WeatherRepository($weather);
+
+  $query = $repository->checkModelStatus($columnOne, $valueOne, $columnTwo, $valueTwo);
   echo $query . ' ';
   $this->assertTrue($query === 'null');
  }
@@ -41,17 +60,19 @@ class CheckModelStatusTest extends TestCase
  * @return void
  */
 
- public function test_for_known_and_fresh_model_from_query_returned_description_is_string_with_content_ok()
+ public function test_for_known_proper_and_fresh_model_is_returned_string_with_content_ok()
  {
 
   $this->seed(TestWarszawaPlSeeder::class);
 
-  $column                                        = 'city';
-  $value                                         = 'warszawa';
+  $columnOne                                        = 'country';
+  $valueOne                                         = 'pl';
+  $columnTwo                                        = 'city';
+  $valueTwo                                         = 'warszawa';
   TimestampsFreshnessController::$acceptedInterval = 60;
   $weather                                       = new Weather();
   $repository                                    = new WeatherRepository($weather);
-  $query                                         = $repository->checkModelStatus($column, $value);
+  $query                                         = $repository->checkModelStatus($columnOne, $valueOne, $columnTwo, $valueTwo);
 
   echo $query . ' ';
   $this->assertTrue($query === 'ok');
@@ -69,13 +90,16 @@ class CheckModelStatusTest extends TestCase
  {
   $this->seed(TestWarszawaPlSeeder::class);
 
-  $column                                        = 'city';
-  $value                                         = 'warszawa';
+ $columnOne = 'country';
+$valueOne  = 'pl';
+$columnTwo = 'city';
+$valueTwo  = 'warszawa';
+
   TimestampsFreshnessController::$acceptedInterval = 60;
   $weather                                       = new Weather();
   $repository                                    = new WeatherRepository($weather);
   sleep(61);
-  $query = $repository->checkModelStatus($column, $value);
+  $query = $repository->checkModelStatus($columnOne, $valueOne, $columnTwo, $valueTwo);
 
   echo $query . ' ';
 

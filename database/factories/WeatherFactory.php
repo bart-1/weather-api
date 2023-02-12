@@ -17,8 +17,8 @@ class WeatherFactory extends Factory
  public function definition()
  {
   return [
-   'city'    => $this->faker->city(),
-   'country' => $this->faker->country(),
+   'city'    => "warszawa",
+   'country' => "pl",
    'weather' => $this->faker->sentence(),
   ];
  }
