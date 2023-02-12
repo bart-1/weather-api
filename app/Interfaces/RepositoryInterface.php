@@ -12,23 +12,17 @@ interface RepositoryInterface
 
  public function delete($id);
 
- public function deleteByColumnValue($column, $value);
-
  public function find($id);
 
  public function findByValue($column, $value);
 
- public function getIDByValue($column, $value);
-
- public function checkIfExistByValue($column, $value);
-
- public function findFreshestByValue($column, $value);
+ public function findFreshestByTwoValues($columnOne, $valueOne, $columnTwo, $valueTwo);
 
  public function getTimestampByValue($column, $value);
 
  public function getLastTimestamp();
 
- public function checkIfModelFreshByValue($column, $value);
+ public function isFreshModelInCollection($collection);
 
- public function checkModelStatus($column, $value);
+ public function checkModelStatus($columnOne, $valueOne, $columnTwo, $valueTwo);
 }

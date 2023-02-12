@@ -15,9 +15,9 @@ class WeatherRepository extends Repository implements WeatherRepositoryInterface
       parent::__construct($weather);
   }
 
-  public function findWeatherByCityName($city)
+  public function findWeather($country, $city)
   {
-    return $this->findFreshestByValue('city', $city);
+    return $this->findFreshestByTwoValues('country', $country, 'city', $city);
   }
 
   public function refreshWeatherData($column, $value, $data)
@@ -26,5 +26,6 @@ class WeatherRepository extends Repository implements WeatherRepositoryInterface
     $this->update($id, $data);
     return 'updated';
   }
+
 
 }

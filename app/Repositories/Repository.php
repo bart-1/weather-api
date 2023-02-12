@@ -37,11 +37,6 @@ class Repository implements RepositoryInterface
  {
   $this->model->findOrFail($id)->delete();
  }
- public function deleteByColumnValue($column, $value)
- {
-  $id = $this->getIDByValue($column, $value);
-  $this->model->findOrFail($id)->delete();
- }
 
  public function find($id)
  {
@@ -52,6 +47,7 @@ class Repository implements RepositoryInterface
  {
   return $this->model->where($column, $value)->get();
  }
+
  public function getIDByValue($column, $value)
  {
   return $this->model->where($column, $value)->value('id');
@@ -65,10 +61,26 @@ class Repository implements RepositoryInterface
    return false;
   }
  }
+ public function checkIfExistByTwoValues($columnOne, $valueOne, $columnTwo, $valueTwo)
+ {
+
+  $country = $this->model->where($columnOne, $valueOne)->get();
+
+  if ($country->where($columnTwo, $valueTwo)->count() > 0) {
+   return true;
+  } else {
+   return false;
+  }
+ }
 
  public function findFreshestByValue($column, $value)
  {
   return $this->model->where($column, $value)->orderByRaw('(updated_at - created_at) DESC')->first();
+ }
+
+ public function findFreshestByTwoValues($columnOne, $valueOne, $columnTwo, $valueTwo)
+ {
+  return $this->model->where($columnOne, $valueOne)->where($columnTwo, $valueTwo)->orderByRaw('(updated_at - created_at) DESC')->first();
  }
 
  public function getTimestampByValue($column, $value)
@@ -86,25 +98,29 @@ class Repository implements RepositoryInterface
   return $this->compareTimeController->isFitInAcceptedInterval($cityDBTimestamp);
  }
 
-/**
- *Check status of record from query. If doesn't exist return 'null', if updatet_at is old,
- * return 'unfresh'
- *@param str $column name of column where it looking for a value
- *@param mix $value
- * @return str null || unfresh || ok
- */
- public function checkModelStatus($column, $value)
+ public function isFreshModelInCollection($collection)
+ {
+  $modelTimestamp = $collection->sortByDesc('updated_at')->first()->value('updated_at');
+  return $this->compareTimeController->isFitInAcceptedInterval($modelTimestamp);
+ }
+
+ public function checkModelStatus($columnOne, $valueOne, $columnTwo, $valueTwo)
  {
 
+  $collection = $this->model->where($columnOne, $valueOne)->where($columnTwo, $valueTwo)->get();
+
   switch (true) {
-   case $this->checkIfExistByValue($column, $value) === false:
+   case $collection->count() < 1:
     return 'null';
     break;
-   case $this->checkIfModelFreshByValue($column, $value) === false:
+   case $this->isFreshModelInCollection($collection) === false:
     return 'unfresh';
     break;
-   default:
+   case $collection->count() > 0:
     return 'ok';
+    break;
+   default:
+    return 'null';
     break;
   }
 

@@ -19,9 +19,9 @@ class WeatherAPIController extends APIController
 
  public function __construct(WeatherRepositoryInterface $repository, OpenWeatherAPI $api)
  {
-  $this->repository = $repository;
-  $this->api               = $api;
-  FrequencyModelUpdateController::$frequency = 1;
+  $this->repository                                = $repository;
+  $this->api                                       = $api;
+  FrequencyModelUpdateController::$frequency       = 1;
   TimestampsFreshnessController::$acceptedInterval = 60;
  }
 
@@ -37,15 +37,18 @@ class WeatherAPIController extends APIController
 
  public function manageRequest($country, $city)
  {
-  $modelCheck = $this->repository->checkModelStatus('city', $city);
+  $modelCheck = $this->repository->checkModelStatus('country',$country, 'city', $city);
 
   switch ($modelCheck) {
    case 'null':
     return $this->prepareData($country, $city, $modelCheck, true);
+    break;
    case 'unfresh':
     return $this->prepareData($country, $city, $modelCheck, true);
+    break;
    case 'ok':
     return $this->prepareData($country, $city, $modelCheck, false);
+    break;
 
    case 'error':
     return $modelCheck;
@@ -62,10 +65,10 @@ class WeatherAPIController extends APIController
  {
   if ($job) {
    QueryJob::dispatchSync($country, $city, $modelCheck);
-   $query = $this->queryDB($city);
+   $query = $this->queryDB($country, $city);
 
   } else {
-   $query = $this->queryDB($city);
+   $query = $this->queryDB($country, $city);
   }
 
   if ($query == null) {
@@ -77,9 +80,9 @@ class WeatherAPIController extends APIController
 
  }
 
- private function queryDB($city)
+ private function queryDB($country, $city)
  {
-  return $this->repository->findWeatherByCityName($city);
+  return $this->repository->findWeather($country, $city);
  }
 
  public function getLastTimestamp()
